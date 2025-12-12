@@ -1,6 +1,6 @@
 <template>
   <el-button size="small" circle icon="Refresh" @click="updateRefsh"></el-button>
-  <el-button size="small" circle icon="fullScreen"></el-button>
+  <el-button size="small" circle icon="fullScreen" @click="fullScreen"></el-button>
 
   <el-popover placement="bottom" title="主题设置" :width="300" trigger="hover">
     <el-form>
@@ -55,6 +55,16 @@ let userStore = useUserStore()
 let LayOutSettingStore = useLayOutSettingStore()
 const updateRefsh = () => {
   LayOutSettingStore.refsh = !LayOutSettingStore.refsh
+}
+
+// 全屏模式切换
+const fullScreen = () => {
+  let full = document.fullscreenElement
+  if (!full) {
+    document.documentElement.requestFullscreen()
+  } else {
+    document.exitFullscreen()
+  }
 }
 
 //颜色组件组件的数据
