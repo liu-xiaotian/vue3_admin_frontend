@@ -9,7 +9,7 @@
       v-show="item.meta.title"
       :to="item.path"
     >
-      <el-icon>
+      <el-icon style="vertical-align: -20%">
         <component :is="item.meta.icon"></component>
       </el-icon>
       <span>{{ item.meta.title }}</span>
