@@ -1,4 +1,5 @@
 import axios from 'axios'
+import useUserStore from '@/stores/modules/user'
 
 //创建axios实例
 const service = axios.create({
@@ -12,9 +13,9 @@ const service = axios.create({
 //请求拦截器
 service.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${this.token}`
+    let userStore = useUserStore()
+    if (userStore.token) {
+      config.headers['Authorization'] = `Bearer ${userStore.token}`
     }
     return config
   },

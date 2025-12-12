@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { reqLogin } from '@/api/user/index'
+import { reqLogin, reqUserInfo } from '@/api/user/index'
 import { SET_TOKEN, GET_TOKEN } from '@/utils/token'
 import { constantRoute } from '@/router/router'
 
@@ -22,6 +22,15 @@ const useUserStore = defineStore('User', {
         return 'ok'
       } else {
         return Promise.reject(new Error(res.data))
+      }
+    },
+    //获取用户信息的方法
+    async userInfo() {
+      let res = await reqUserInfo()
+      if (res.code == 200) {
+        this.username = res.data.checkUser.username
+        this.avatar = res.data.checkUser.avatar
+      } else {
       }
     }
   },
