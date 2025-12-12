@@ -10,7 +10,9 @@
       </el-scrollbar>
     </div>
     <!-- 顶部导航 -->
-    <div class="layout_tabbar"></div>
+    <div class="layout_tabbar">
+      <Tabbar></Tabbar>
+    </div>
     <!-- 内容展示 -->
     <div class="layout_main">
       <Main></Main>
@@ -22,6 +24,7 @@
 import logo from '@/layout/logo/index.vue'
 import Menu from '@/layout/menu/index.vue'
 import Main from '@/layout/main/index.vue'
+import Tabbar from './tabbar/index.vue'
 import useUserStore from '@/stores/modules/user'
 const userStore = useUserStore()
 </script>

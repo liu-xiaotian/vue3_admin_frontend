@@ -7,7 +7,9 @@ const useUserStore = defineStore('User', {
   state: () => {
     return {
       token: localStorage.getItem('TOKEN'),
-      menuRoutes: constantRoute //仓库存储生成菜单需要数组(路由)
+      menuRoutes: constantRoute, //仓库存储生成菜单需要数组(路由)
+      avatar: '',
+      username: '123'
     }
   },
   actions: {
