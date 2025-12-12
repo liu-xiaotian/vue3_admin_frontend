@@ -4,17 +4,23 @@
     <div class="layout_slider">
       <logo />
       <el-scrollbar class="scrollbar">
-        <el-menu background-color="#001529" text-color="white" active-text-color="yellowgreen">
+        <el-menu
+          :collapse="LayOutSettingStore.fold ? true : false"
+          :default-active="$route.path"
+          background-color="#001529"
+          text-color="white"
+          active-text-color="yellowgreen"
+        >
           <Menu :menuList="userStore.menuRoutes"></Menu>
         </el-menu>
       </el-scrollbar>
     </div>
     <!-- 顶部导航 -->
-    <div class="layout_tabbar">
+    <div class="layout_tabbar" :class="{ fold: LayOutSettingStore.fold ? true : false }">
       <Tabbar></Tabbar>
     </div>
     <!-- 内容展示 -->
-    <div class="layout_main">
+    <div class="layout_main" :class="{ fold: LayOutSettingStore.fold ? true : false }">
       <Main></Main>
     </div>
   </div>
@@ -26,7 +32,9 @@ import Menu from '@/layout/menu/index.vue'
 import Main from '@/layout/main/index.vue'
 import Tabbar from './tabbar/index.vue'
 import useUserStore from '@/stores/modules/user'
+import useLayOutSettingStore from '@/stores/modules/setting'
 const userStore = useUserStore()
+let LayOutSettingStore = useLayOutSettingStore()
 </script>
 
 <style lang="scss" scoped>
@@ -43,7 +51,12 @@ const userStore = useUserStore()
     transition: all 0.3s;
 
     .scrollbar {
+      width: 100%;
       height: calc(100vh - $base-menu-logo-height);
+
+      .el-menu {
+        border-right: none;
+      }
     }
   }
 
@@ -55,6 +68,11 @@ const userStore = useUserStore()
     width: calc(100% - $base-menu-width);
     height: $base-tabbar-height;
     transition: all 0.3s;
+
+    &.fold {
+      width: calc(100vw - $base-menu-min-width);
+      left: $base-menu-min-width;
+    }
   }
 
   .layout_main {
@@ -67,6 +85,11 @@ const userStore = useUserStore()
     padding: 20px;
     overflow: auto;
     transition: all 0.3s;
+
+    &.fold {
+      width: calc(100vw - $base-menu-min-width);
+      left: $base-menu-min-width;
+    }
   }
 }
 </style>

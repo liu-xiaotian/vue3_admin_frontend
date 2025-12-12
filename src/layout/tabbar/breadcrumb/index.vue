@@ -1,6 +1,6 @@
 <template>
-  <el-icon style="margin-right: 10px">
-    <component :is="1 > 2 ? 'Fold' : 'Expand'"></component>
+  <el-icon style="margin-right: 10px" @click="changeIcon">
+    <component :is="LayOutSettingStore.fold ? 'Fold' : 'Expand'"></component>
   </el-icon>
   <el-breadcrumb separator-icon="ArrowRight">
     <el-breadcrumb-item
@@ -19,8 +19,14 @@
 
 <script setup>
 import { useRoute } from 'vue-router'
+import useLayOutSettingStore from '@/stores/modules/setting'
 //获取路由对象
 let $route = useRoute()
+let LayOutSettingStore = useLayOutSettingStore()
+
+const changeIcon = () => {
+  LayOutSettingStore.fold = !LayOutSettingStore.fold
+}
 </script>
 <script>
 export default {
