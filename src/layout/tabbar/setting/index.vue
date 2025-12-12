@@ -1,5 +1,5 @@
 <template>
-  <el-button size="small" circle icon="Refresh"></el-button>
+  <el-button size="small" circle icon="Refresh" @click="updateRefsh"></el-button>
   <el-button size="small" circle icon="fullScreen"></el-button>
 
   <el-popover placement="bottom" title="主题设置" :width="300" trigger="hover">
@@ -49,8 +49,13 @@
 
 <script setup>
 import useUserStore from '@/stores/modules/user'
+import useLayOutSettingStore from '@/stores/modules/setting'
 import { ref } from 'vue'
 let userStore = useUserStore()
+let LayOutSettingStore = useLayOutSettingStore()
+const updateRefsh = () => {
+  LayOutSettingStore.refsh = !LayOutSettingStore.refsh
+}
 
 //颜色组件组件的数据
 const color = ref('rgba(255, 69, 0, 0.68)')
