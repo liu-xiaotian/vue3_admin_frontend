@@ -41,7 +41,7 @@
     </span>
     <template #dropdown>
       <el-dropdown-menu>
-        <el-dropdown-item>退出登录</el-dropdown-item>
+        <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
       </el-dropdown-menu>
     </template>
   </el-dropdown>
@@ -51,8 +51,12 @@
 import useUserStore from '@/stores/modules/user'
 import useLayOutSettingStore from '@/stores/modules/setting'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 let userStore = useUserStore()
 let LayOutSettingStore = useLayOutSettingStore()
+let $router = useRouter()
+let $route = useRoute()
 const updateRefsh = () => {
   LayOutSettingStore.refsh = !LayOutSettingStore.refsh
 }
@@ -65,6 +69,12 @@ const fullScreen = () => {
   } else {
     document.exitFullscreen()
   }
+}
+
+// 退出登录
+const logout = async () => {
+  await userStore.userLogout()
+  $router.push({ path: '/login', query: { redirect: $route.path } })
 }
 
 //颜色组件组件的数据
