@@ -18,4 +18,6 @@ app.use(router)
 //安装自定义插件
 app.use(gloalComponent)
 
+import './permisstion'
+
 app.mount('#app')
