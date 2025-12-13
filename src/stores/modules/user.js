@@ -31,6 +31,7 @@ const useUserStore = defineStore('User', {
         this.username = res.data.checkUser.username
         this.avatar = res.data.checkUser.avatar
       } else {
+        return Promise.reject(new Error(res.message))
       }
     }
   },
