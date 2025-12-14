@@ -72,7 +72,7 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
-import { reqHasTrademark } from '@/api/product/trademark/index'
+import { reqHasTrademark, reqAddOrUpdateTrademark } from '@/api/product/trademark/index'
 let trademarkArr = ref([])
 let pageNo = ref(0)
 let limit = ref(3)
@@ -104,6 +104,9 @@ onMounted(() => getHasTrademark())
 // 新增修改弹框
 const addTrademark = () => {
   dialogFormVisible.value = true
+  // 清空收集数据
+  trademarkParams.id = 0
+  ;((trademarkParams.tmName = ''), (trademarkParams.logoUrl = ''))
 }
 const cancel = () => {
   dialogFormVisible.value = false
@@ -134,6 +137,7 @@ const rules = {
 // el-upload 上传 http 请求头，携带 Token
 // 引入用户相关的仓库
 import useUserStore from '@/stores/modules/user'
+import { ElMessage } from 'element-plus'
 // 获取用户相关的小仓库：获取仓库内部token，登录成功以后携带给服务器
 const userStore = useUserStore()
 const headers = { Token: userStore.token }
@@ -166,6 +170,21 @@ const handleAvatarSuccess = (response, uploadFile) => {
 const formRef = ref()
 const confirm = async () => {
   await formRef.value.validate()
+  let res = await reqAddOrUpdateTrademark(trademarkParams)
+  if (res.code == 200) {
+    dialogFormVisible.value = false
+    ElMessage({
+      type: 'success',
+      message: trademarkParams.id ? '修改品牌成功' : '添加品牌成功'
+    })
+    getHasTrademark(trademarkParams.id ? pageNo.value : 1)
+  } else {
+    ElMessage({
+      type: 'error',
+      message: trademarkParams.id ? '修改品牌失败' : '添加品牌失败'
+    })
+    dialogFormVisible.value = false
+  }
 }
 </script>
 
