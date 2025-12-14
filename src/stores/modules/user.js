@@ -28,7 +28,7 @@ const useUserStore = defineStore('User', {
     async userInfo() {
       let res = await reqUserInfo()
       if (res.code == 200) {
-        this.username = res.data.username
+        this.username = res.data.name
         this.avatar = res.data.avatar
         return 'ok'
       } else {
