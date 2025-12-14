@@ -78,6 +78,14 @@
 <script setup>
 import { onMounted, reactive, ref, nextTick } from 'vue'
 import { reqHasTrademark, reqAddOrUpdateTrademark } from '@/api/product/trademark/index'
+// el-upload 上传 http 请求头，携带 Token
+// 引入用户相关的仓库
+import useUserStore from '@/stores/modules/user'
+import { ElMessage } from 'element-plus'
+// 获取用户相关的小仓库：获取仓库内部token，登录成功以后携带给服务器
+const userStore = useUserStore()
+const headers = { Token: userStore.token }
+
 let trademarkArr = ref([])
 let pageNo = ref(0)
 let limit = ref(3)
@@ -144,14 +152,6 @@ const rules = {
   logoUrl: [{ required: true, validator: validatorLogoUrl }]
 }
 
-// el-upload 上传 http 请求头，携带 Token
-// 引入用户相关的仓库
-import useUserStore from '@/stores/modules/user'
-import { ElMessage } from 'element-plus'
-// 获取用户相关的小仓库：获取仓库内部token，登录成功以后携带给服务器
-const userStore = useUserStore()
-const headers = { Token: userStore.token }
-
 // 文件上传之前
 const beforeAvatarUpload = (rawFile) => {
   if (rawFile.type == 'image/png' || rawFile.type == 'image/jpeg' || rawFile.type == 'image/gif') {
@@ -177,7 +177,6 @@ const handleAvatarSuccess = (response, uploadFile) => {
 }
 
 // 上传
-
 const confirm = async () => {
   await formRef.value.validate()
   let res = await reqAddOrUpdateTrademark(trademarkParams)
