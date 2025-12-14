@@ -3,9 +3,9 @@ import request from '@/utils/request'
 
 // 项目用户相关的请求地址
 const API = {
-  LOGIN_URL: '/api/user/login',
-  USERINFO_URL: '/api/user/info',
-  LOGOUT_URL: '/api/user/logout'
+  LOGIN_URL: '/admin/acl/index/login',
+  USERINFO_URL: '/admin/acl/index/info',
+  LOGOUT_URL: '/admin/acl/index/logout'
 }
 
 //登录接口方法

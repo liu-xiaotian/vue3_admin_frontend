@@ -18,7 +18,7 @@ const useUserStore = defineStore('User', {
       const res = await reqLogin(data)
       if (res.code == 200) {
         this.token = res.data
-        SET_TOKEN(res.data.token)
+        SET_TOKEN(res.data)
         return 'ok'
       } else {
         return Promise.reject(new Error(res.data))
@@ -28,8 +28,9 @@ const useUserStore = defineStore('User', {
     async userInfo() {
       let res = await reqUserInfo()
       if (res.code == 200) {
-        this.username = res.data.checkUser.username
-        this.avatar = res.data.checkUser.avatar
+        this.username = res.data.username
+        this.avatar = res.data.avatar
+        return 'ok'
       } else {
         return Promise.reject(new Error(res.message))
       }
@@ -38,10 +39,10 @@ const useUserStore = defineStore('User', {
     async userLogout() {
       const result = await reqLogout()
       if (result.code == 200) {
+        REMOVE_TOKEN()
         this.token = ''
         this.username = ''
         this.avatar = ''
-        REMOVE_TOKEN()
         return 'ok'
       } else {
         return Promise.reject(new Error(result.message))

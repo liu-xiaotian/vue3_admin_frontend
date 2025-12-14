@@ -50,6 +50,8 @@ const login = async () => {
 
     let redirect = $route.query.redirect
     $router.push({ path: redirect || '/' })
+    console.log(redirect)
+
     ElNotification({
       type: 'success',
       message: '欢迎回来',

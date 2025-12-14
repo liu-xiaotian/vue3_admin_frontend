@@ -4,7 +4,7 @@ import useUserStore from '@/stores/modules/user'
 //创建axios实例
 const service = axios.create({
   baseURL: import.meta.env.VITE_APP_BASE_API,
-  timeout: 10000,
+  timeout: 5000,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -15,7 +15,8 @@ service.interceptors.request.use(
   (config) => {
     let userStore = useUserStore()
     if (userStore.token) {
-      config.headers['Authorization'] = `Bearer ${userStore.token}`
+      // config.headers['Authorization'] = `Bearer ${userStore.token}`
+      config.headers.token = userStore.token
     }
     return config
   },

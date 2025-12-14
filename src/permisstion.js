@@ -4,14 +4,17 @@ import nprogress from 'nprogress'
 import 'nprogress/nprogress.css'
 import useUserStore from '@/stores/modules/user'
 import setting from './setting'
-const userStore = useUserStore()
 
 router.beforeEach(async (to, from, next) => {
+  const userStore = useUserStore()
   document.title = `${setting.title} - ${to.meta.title}`
   nprogress.start()
   const token = userStore.token
   const username = userStore.username
+  console.log(`token:${token}`)
+
   if (token) {
+    console.log('执行有token的逻辑')
     if (to.path == '/login') {
       next({ path: '/' })
     } else {
@@ -19,7 +22,9 @@ router.beforeEach(async (to, from, next) => {
         next()
       } else {
         try {
-          await userStore.userLogin()
+          const res = await userStore.userInfo()
+          console.log(res)
+
           next({ ...to })
         } catch (error) {
           await userStore.userLogout()
@@ -28,6 +33,7 @@ router.beforeEach(async (to, from, next) => {
       }
     }
   } else {
+    console.log('执行没有token的逻辑')
     if (to.path == '/login') {
       next()
     } else {
