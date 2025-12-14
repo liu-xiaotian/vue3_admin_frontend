@@ -37,12 +37,19 @@
     </el-card>
     <!-- 添加和修改品牌对话框 -->
     <el-dialog v-model="dialogFormVisible" :title="trademarkParams.id ? '修改品牌' : '添加品牌'">
-      <el-form style="width: 80%" :model="trademarkParams" :rules="rules">
+      <el-form style="width: 80%" :model="trademarkParams" :rules="rules" ref="formRef">
         <el-form-item label="品牌名称" label-width="100px" prop="tmName">
           <el-input placeholder="请输入品牌名称" v-model="trademarkParams.tmName"></el-input>
         </el-form-item>
         <el-form-item label="品牌logo" label-width="100px" prop="logoUrl">
-          <el-upload class="avatar-uploader">
+          <el-upload
+            class="avatar-uploader"
+            :headers="headers"
+            action="/api/admin/product/fileUpload"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
+          >
             <img
               v-if="trademarkParams.logoUrl"
               :src="trademarkParams.logoUrl"
@@ -123,14 +130,67 @@ const rules = {
   tmName: [{ required: true, trigger: 'blur', validator: validatorTmName }],
   logoUrl: [{ required: true, validator: validatorLogoUrl }]
 }
+
+// el-upload 上传 http 请求头，携带 Token
+// 引入用户相关的仓库
+import useUserStore from '@/stores/modules/user'
+// 获取用户相关的小仓库：获取仓库内部token，登录成功以后携带给服务器
+const userStore = useUserStore()
+const headers = { Token: userStore.token }
+
+// 文件上传之前
+const beforeAvatarUpload = (rawFile) => {
+  if (rawFile.type == 'image/png' || rawFile.type == 'image/jpeg' || rawFile.type == 'image/gif') {
+    if (rawFile.size / 1024 / 1024 < 4) {
+      return true
+    } else {
+      ElMessage({
+        type: 'error',
+        message: '上传文件大小小于4M'
+      })
+      return false
+    }
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '上传文件格式务必PNG|JPG|GIF'
+    })
+    return false
+  }
+}
+const handleAvatarSuccess = (response, uploadFile) => {
+  trademarkParams.logoUrl = response.data
+}
+
+// 上传
+const formRef = ref()
+const confirm = async () => {
+  await formRef.value.validate()
+}
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .avatar-uploader .avatar {
   width: 178px;
   height: 178px;
   display: block;
 }
+</style>
+
+<style>
+.avatar-uploader .el-upload {
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: var(--el-transition-duration-fast);
+}
+
+.avatar-uploader .el-upload:hover {
+  border-color: var(--el-color-primary);
+}
+
 .el-icon.avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
