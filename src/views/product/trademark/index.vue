@@ -14,7 +14,12 @@
         </el-table-column>
         <el-table-column label="品牌操作">
           <template #default="{ row }">
-            <el-button type="primary" size="small" icon="Edit"></el-button>
+            <el-button
+              type="primary"
+              size="small"
+              icon="Edit"
+              @click="updateTrademark(row)"
+            ></el-button>
             <el-popconfirm :title="`您确定要删除${row}`" width="250px" icon="Delete">
               <template #reference>
                 <el-button type="primary" size="small" icon="Delete"></el-button>
@@ -71,7 +76,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, nextTick } from 'vue'
 import { reqHasTrademark, reqAddOrUpdateTrademark } from '@/api/product/trademark/index'
 let trademarkArr = ref([])
 let pageNo = ref(0)
@@ -83,7 +88,7 @@ let trademarkParams = reactive({
   tmName: '',
   logoUrl: ''
 })
-
+const formRef = ref()
 const getHasTrademark = async (page = 1) => {
   pageNo.value = page
   const res = await reqHasTrademark(pageNo.value, limit.value)
@@ -101,12 +106,17 @@ const sizeChange = () => {
 }
 onMounted(() => getHasTrademark())
 
-// 新增修改弹框
+// 新增和修改弹框
 const addTrademark = () => {
   dialogFormVisible.value = true
   // 清空收集数据
   trademarkParams.id = 0
-  ;((trademarkParams.tmName = ''), (trademarkParams.logoUrl = ''))
+  trademarkParams.tmName = ''
+  trademarkParams.logoUrl = ''
+  nextTick(() => {
+    formRef.value.clearValidate('TmName')
+    formRef.value.clearValidate('logoUrl')
+  })
 }
 const cancel = () => {
   dialogFormVisible.value = false
@@ -167,7 +177,7 @@ const handleAvatarSuccess = (response, uploadFile) => {
 }
 
 // 上传
-const formRef = ref()
+
 const confirm = async () => {
   await formRef.value.validate()
   let res = await reqAddOrUpdateTrademark(trademarkParams)
@@ -185,6 +195,16 @@ const confirm = async () => {
     })
     dialogFormVisible.value = false
   }
+}
+
+// 修改品牌
+const updateTrademark = (row) => {
+  nextTick(() => {
+    formRef.value.clearValidate('tmName')
+    formRef.value.clearValidate('logoUrl')
+  })
+  dialogFormVisible.value = true
+  Object.assign(trademarkParams, row)
 }
 </script>
 
