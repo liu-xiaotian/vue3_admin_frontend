@@ -28,5 +28,5 @@ export const reqAddOrUpdateTrademark = (data) => {
 }
 
 export const reqDeleteTrademark = (id) => {
-  request.delete(API.DELETE_URL + id)
+  return request.delete(API.DELETE_URL + id)
 }

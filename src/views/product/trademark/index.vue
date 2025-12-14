@@ -20,7 +20,12 @@
               icon="Edit"
               @click="updateTrademark(row)"
             ></el-button>
-            <el-popconfirm :title="`您确定要删除${row}`" width="250px" icon="Delete">
+            <el-popconfirm
+              :title="`您确定要删除${row.tmName}?`"
+              width="250px"
+              icon="Delete"
+              @confirm="removeTradeMark(row.id)"
+            >
               <template #reference>
                 <el-button type="primary" size="small" icon="Delete"></el-button>
               </template>
@@ -77,11 +82,15 @@
 
 <script setup>
 import { onMounted, reactive, ref, nextTick } from 'vue'
-import { reqHasTrademark, reqAddOrUpdateTrademark } from '@/api/product/trademark/index'
+import {
+  reqHasTrademark,
+  reqAddOrUpdateTrademark,
+  reqDeleteTrademark
+} from '@/api/product/trademark/index'
 // el-upload 上传 http 请求头，携带 Token
 // 引入用户相关的仓库
 import useUserStore from '@/stores/modules/user'
-import { ElMessage } from 'element-plus'
+
 // 获取用户相关的小仓库：获取仓库内部token，登录成功以后携带给服务器
 const userStore = useUserStore()
 const headers = { Token: userStore.token }
@@ -204,6 +213,23 @@ const updateTrademark = (row) => {
   })
   dialogFormVisible.value = true
   Object.assign(trademarkParams, row)
+}
+
+// 删除品牌
+const removeTradeMark = async (id) => {
+  const res = await reqDeleteTrademark(id)
+  if (res.code == 200) {
+    ElMessage({
+      type: 'success',
+      message: '删除品牌成功'
+    })
+    getHasTrademark(trademarkArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '删除品牌失败'
+    })
+  }
 }
 </script>
 
