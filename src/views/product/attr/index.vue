@@ -67,12 +67,17 @@
                 size="small"
                 placeholder="请你输入属性值名称"
               ></el-input>
-              <div v-else>{{ row.valueName }}</div>
+              <div v-else @click="toEdit(row, $index)">{{ row.valueName }}</div>
             </template>
           </el-table-column>
           <el-table-column label="属性值操作" width="120px">
-            <template #default="{ row }">
-              <el-button type="primary" size="small" icon="Delete"></el-button>
+            <template #default="{ index }">
+              <el-button
+                @click="attrParams.attrValueList.splice(index, 1)"
+                type="primary"
+                size="small"
+                icon="Delete"
+              ></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -191,6 +196,11 @@ const toLook = (row, $index) => {
     return
   }
   row.flag = false
+}
+// 属性值div点击可以编辑事件
+const toEdit = (row, $index) => {
+  row.flag = true
+  nextTick(() => [inputArr.value[$index].focus()])
 }
 </script>
 
