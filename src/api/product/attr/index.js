@@ -24,3 +24,5 @@ export const reqC1 = () => {
 export const reqC2 = (category1Id) => request.get(API.C2_URL + category1Id)
 //获取二级分类的接口方法
 export const reqC3 = (category2Id) => request.get(API.C3_URL + category2Id)
+
+export const reqAttr = (c1Id, c2Id, c3Id) => request.get(API.ATTR_URL + `${c1Id}/${c2Id}/${c3Id}`)
