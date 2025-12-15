@@ -60,6 +60,7 @@
           <el-table-column label="属性值名称">
             <template #default="{ row, $index }">
               <el-input
+                @blur="toLook(row, $index)"
                 :ref="(vc) => (inputArr[$index] = vc)"
                 v-if="row.flag"
                 v-model="row.valueName"
@@ -156,6 +157,33 @@ const save = async () => {
       message: attrParams.id ? '修改失败' : '添加失败'
     })
   }
+}
+// 表单属性值失去焦点时的回调
+const toLook = (row, $index) => {
+  if (row.valueName.trim() == '') {
+    attrParams.attrValueList.splice($index, 1)
+    //提示信息
+    ElMessage({
+      type: 'error',
+      message: '属性值不能为空'
+    })
+    return
+  }
+  let repeat = attrParams.attrValueList.find((item) => {
+    if (item != row) {
+      return item.valueName === row.valueName
+    }
+  })
+  if (repeat) {
+    attrParams.attrValueList.splice($index, 1)
+    //提示信息
+    ElMessage({
+      type: 'error',
+      message: '属性值不能重复'
+    })
+    return
+  }
+  row.flag = false
 }
 </script>
 
