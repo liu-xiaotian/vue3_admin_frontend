@@ -101,7 +101,7 @@ let scene = ref(0)
 let attrParams = reactive({
   attrName: '',
   attrValueList: [],
-  categoryId: categoryStore.c3Id,
+  categoryId: '',
   categoryLevel: 3
 })
 //准备一个数组:将来存储对应的组件实例el-input
@@ -124,6 +124,13 @@ const getAttr = async () => {
 
 // 控制添加属性面板
 const addAttr = () => {
+  //每一次点击的时候,先清空一下数据再收集数据
+  Object.assign(attrParams, {
+    attrName: '',
+    attrValueList: [],
+    categoryId: categoryStore.c3Id,
+    categoryLevel: 3
+  })
   scene.value = 1
 }
 //取消按钮的回调
