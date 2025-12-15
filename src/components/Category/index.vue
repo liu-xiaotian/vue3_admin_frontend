@@ -1,8 +1,9 @@
 <template>
-  <el-card style="margin: 0 0 10px 0">
+  <el-card>
     <el-form :inline="true">
       <el-form-item label="一级分类">
         <el-select
+          :disabled="scene == 0 ? false : true"
           @change="handle"
           v-model="categoryStore.c1Id"
           placeholder="请选择"
@@ -18,6 +19,7 @@
       </el-form-item>
       <el-form-item label="二级分类">
         <el-select
+          :disabled="scene == 0 ? false : true"
           @change="handle1"
           v-model="categoryStore.c2Id"
           placeholder="请选择"
@@ -32,7 +34,12 @@
         </el-select>
       </el-form-item>
       <el-form-item label="三级分类">
-        <el-select v-model="categoryStore.c3Id" placeholder="请选择" style="width: 200px">
+        <el-select
+          :disabled="scene == 0 ? false : true"
+          v-model="categoryStore.c3Id"
+          placeholder="请选择"
+          style="width: 200px"
+        >
           <el-option
             v-for="c3 in categoryStore.c3Arr"
             :key="c3.id"
@@ -66,6 +73,9 @@ const handle1 = () => {
   categoryStore.c3Id = ''
   categoryStore.getC3()
 }
+
+//接受父组件传递过来scene
+defineProps(['scene'])
 </script>
 
 <style lang="scss" scoped></style>
