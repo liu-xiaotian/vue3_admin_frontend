@@ -28,3 +28,5 @@ export const reqC3 = (category2Id) => request.get(API.C3_URL + category2Id)
 export const reqAttr = (c1Id, c2Id, c3Id) => request.get(API.ATTR_URL + `${c1Id}/${c2Id}/${c3Id}`)
 //新增或者修改已有的属性接口
 export const reqAddOrUpdateAttr = (data) => request.post(API.ADDORUPDATEATTR_URL, data)
+
+export const reqRemoveAttr = (id) => request.delete(API.DELETEATTR_URL + id)

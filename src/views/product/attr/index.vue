@@ -30,7 +30,11 @@
                 icon="Edit"
                 @click="updateAttr(row)"
               ></el-button>
-              <el-popconfirm>
+              <el-popconfirm
+                :title="`你确定删除${row.attrName}`"
+                width="200px"
+                @confirm="deleteAttr(row.id)"
+              >
                 <template #reference>
                   <el-button type="primary" size="small" icon="Delete"></el-button>
                 </template>
@@ -54,7 +58,7 @@
           icon="Plus"
           >添加属性值</el-button
         >
-        <el-button type="primary" size="default">取消</el-button>
+        <el-button @click="cancel" type="primary" size="default">取消</el-button>
         <el-table border style="margin: 10px 0" :data="attrParams.attrValueList">
           <el-table-column label="序号" type="index" align="center" width="80px"></el-table-column>
           <el-table-column label="属性值名称">
@@ -95,9 +99,9 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch, nextTick } from 'vue'
+import { reactive, ref, watch, nextTick, onBeforeUnmount } from 'vue'
 import useCategoryStore from '@/stores/modules/category'
-import { reqAttr, reqAddOrUpdateAttr } from '@/api/product/attr'
+import { reqAttr, reqAddOrUpdateAttr, reqRemoveAttr } from '@/api/product/attr'
 let categoryStore = useCategoryStore()
 let attrArr = ref([])
 //定义card组件内容切换变量
@@ -141,10 +145,12 @@ const addAttr = () => {
 //取消按钮的回调
 const cancel = () => {
   scene.value = 0
+  getAttr()
 }
 // 修改属性
 const updateAttr = (row) => {
   scene.value = 1
+  Object.assign(attrParams, JSON.parse(JSON.stringify(row)))
 }
 // 添加属性值按钮的回调
 const addAttrValue = () => {
@@ -163,6 +169,7 @@ const save = async () => {
       type: 'success',
       message: attrParams.id ? '修改成功' : '添加成功'
     })
+    getAttr()
   } else {
     ElMessage({
       type: 'error',
@@ -202,6 +209,30 @@ const toEdit = (row, $index) => {
   row.flag = true
   nextTick(() => [inputArr.value[$index].focus()])
 }
+
+// 删除属性
+const deleteAttr = async (row) => {
+  const res = await reqRemoveAttr(row)
+  //删除成功
+  if (res.code == 200) {
+    ElMessage({
+      type: 'success',
+      message: '删除成功'
+    })
+    //获取一次已有的属性与属性值
+    getAttr()
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '删除失败'
+    })
+  }
+}
+
+onBeforeUnmount(() => {
+  // 清空仓库的数据
+  categoryStore.$reset()
+})
 </script>
 
 <style lang="scss" scoped></style>
