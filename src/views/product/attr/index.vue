@@ -47,6 +47,7 @@
           </el-form-item>
         </el-form>
         <el-button
+          @click="addAttrValue"
           :disabled="attrParams.attrName ? false : true"
           type="primary"
           size="default"
@@ -57,8 +58,15 @@
         <el-table border style="margin: 10px 0" :data="attrParams.attrValueList">
           <el-table-column label="序号" type="index" align="center" width="80px"></el-table-column>
           <el-table-column label="属性值名称">
-            <template #default="{ row }">
-              <el-input size="small" placeholder="请你输入属性值名称"></el-input>
+            <template #default="{ row, $index }">
+              <el-input
+                :ref="(vc) => (inputArr[$index] = vc)"
+                v-if="row.flag"
+                v-model="row.valueName"
+                size="small"
+                placeholder="请你输入属性值名称"
+              ></el-input>
+              <div v-else>{{ row.valueName }}</div>
             </template>
           </el-table-column>
           <el-table-column label="属性值操作" width="120px">
@@ -68,6 +76,7 @@
           </el-table-column>
         </el-table>
         <el-button
+          @click="save"
           type="primary"
           size="default"
           :disabled="attrParams.attrValueList.length > 0 ? false : true"
@@ -80,9 +89,9 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref, watch, nextTick } from 'vue'
 import useCategoryStore from '@/stores/modules/category'
-import { reqAttr } from '@/api/product/attr'
+import { reqAttr, reqAddOrUpdateAttr } from '@/api/product/attr'
 let categoryStore = useCategoryStore()
 let attrArr = ref([])
 //定义card组件内容切换变量
@@ -91,10 +100,11 @@ let scene = ref(0)
 let attrParams = reactive({
   attrName: '',
   attrValueList: [],
-  categoryId: '',
+  categoryId: categoryStore.c3Id,
   categoryLevel: 3
 })
-
+//准备一个数组:将来存储对应的组件实例el-input
+let inputArr = ref([])
 watch(
   () => categoryStore.c3Id,
   () => {
@@ -111,7 +121,7 @@ const getAttr = async () => {
   }
 }
 
-// 添加属性
+// 控制添加属性面板
 const addAttr = () => {
   scene.value = 1
 }
@@ -122,6 +132,30 @@ const cancel = () => {
 // 修改属性
 const updateAttr = (row) => {
   scene.value = 1
+}
+// 添加属性值按钮的回调
+const addAttrValue = () => {
+  attrParams.attrValueList.push({
+    valueName: '',
+    flag: true
+  })
+  nextTick(() => inputArr.value[attrParams.attrValueList.length - 1].focus())
+}
+// 保存
+const save = async () => {
+  let res = await reqAddOrUpdateAttr(attrParams)
+  if (res.code == 200) {
+    scene.value = 0
+    ElMessage({
+      type: 'success',
+      message: attrParams.id ? '修改成功' : '添加成功'
+    })
+  } else {
+    ElMessage({
+      type: 'error',
+      message: attrParams.id ? '修改失败' : '添加失败'
+    })
+  }
 }
 </script>
 

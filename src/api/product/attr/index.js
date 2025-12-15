@@ -24,5 +24,7 @@ export const reqC1 = () => {
 export const reqC2 = (category1Id) => request.get(API.C2_URL + category1Id)
 //获取二级分类的接口方法
 export const reqC3 = (category2Id) => request.get(API.C3_URL + category2Id)
-
+//获取对应分类下已有的属性与属性值接口
 export const reqAttr = (c1Id, c2Id, c3Id) => request.get(API.ATTR_URL + `${c1Id}/${c2Id}/${c3Id}`)
+//新增或者修改已有的属性接口
+export const reqAddOrUpdateAttr = (data) => request.post(API.ADDORUPDATEATTR_URL, data)
