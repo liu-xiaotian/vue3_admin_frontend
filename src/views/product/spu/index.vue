@@ -15,9 +15,15 @@
         <el-table-column label="SPU名称" prop="spuName"></el-table-column>
         <el-table-column label="SPU描述" prop="description" show-overflow-tooltip></el-table-column>
         <el-table-column label="SPU操作">
-          <template #default="{}">
+          <template #default="{ row }">
             <el-button type="primary" size="small" icon="Plus" title="添加SKU"></el-button>
-            <el-button type="primary" size="small" icon="Edit" title="修改SPU"></el-button>
+            <el-button
+              type="primary"
+              size="small"
+              icon="Edit"
+              title="修改SPU"
+              @click="updateSpu(row)"
+            ></el-button>
             <el-button type="primary" size="small" icon="View" title="查看SKU列表"></el-button>
             <el-popconfirm>
               <template #reference>
@@ -40,7 +46,7 @@
         @current-change="getHasSpu"
       />
     </div>
-    <spuForm v-show="scene == 1" @changeScene="changeScene"></spuForm>
+    <spuForm ref="spu" v-show="scene == 1" @changeScene="changeScene"></spuForm>
   </el-card>
 </template>
 
@@ -60,6 +66,8 @@ let pageSize = ref(3)
 let records = ref([])
 //存储已有SPU总个数
 let total = ref(0)
+// 1. 定义一个名字与模板中 ref 属性相同的变量
+const spu = ref(null)
 //此方法执行:可以获取某一个三级分类下全部的已有的SPU
 const getHasSpu = async (pager = 1) => {
   //修改当前页码
@@ -67,7 +75,7 @@ const getHasSpu = async (pager = 1) => {
   let res = await reqHasSpu(pageNo.value, pageSize.value, categoryStore.c3Id)
   if (res.code == 200) {
     records.value = res.data.records
-    total.value = res.data.value
+    total.value = res.data.total
   }
 }
 watch(
@@ -91,6 +99,11 @@ const addSpu = () => {
 // 子组件spuForm绑定自定义事件
 const changeScene = (num) => {
   scene.value = num
+}
+// 修改SPU
+const updateSpu = (row) => {
+  scene.value = 1
+  spu.value.initHasSpuData(row)
 }
 </script>
 
