@@ -3,6 +3,7 @@
   <el-card style="margin: 10px 0">
     <div v-show="scene == 0">
       <el-button
+        @click="addSpu"
         :disabled="categoryStore.c3Id ? false : true"
         type="primary"
         size="default"
@@ -39,6 +40,7 @@
         @current-change="getHasSpu"
       />
     </div>
+    <spuForm v-show="scene == 1" @changeScene="changeScene"></spuForm>
   </el-card>
 </template>
 
@@ -47,6 +49,7 @@ import { ref, watch } from 'vue'
 import Category from '@/components/Category/index.vue'
 import useCategoryStore from '@/stores/modules/category'
 import { reqHasSpu, reqAllTradeMark } from '@/api/product/spu'
+import spuForm from './spuForm.vue'
 const scene = ref(0)
 const categoryStore = useCategoryStore()
 //分页器默认页码
@@ -79,6 +82,15 @@ watch(
 //分页器下拉菜单发生变化的时候触发
 const changeSize = () => {
   getHasSpu()
+}
+
+// 添加spu（显示组件）
+const addSpu = () => {
+  scene.value = 1
+}
+// 子组件spuForm绑定自定义事件
+const changeScene = (num) => {
+  scene.value = num
 }
 </script>
 
