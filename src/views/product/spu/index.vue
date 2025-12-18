@@ -16,7 +16,13 @@
         <el-table-column label="SPU描述" prop="description" show-overflow-tooltip></el-table-column>
         <el-table-column label="SPU操作">
           <template #default="{ row }">
-            <el-button type="primary" size="small" icon="Plus" title="添加SKU"></el-button>
+            <el-button
+              @click="addSku(row)"
+              type="primary"
+              size="small"
+              icon="Plus"
+              title="添加SKU"
+            ></el-button>
             <el-button
               type="primary"
               size="small"
@@ -47,6 +53,7 @@
       />
     </div>
     <spuForm ref="spu" v-show="scene == 1" @changeScene="changeScene"></spuForm>
+    <skuForm ref="sku" v-show="scene == 2" @changeScene="changeScene"></skuForm>
   </el-card>
 </template>
 
@@ -54,8 +61,9 @@
 import { ref, watch } from 'vue'
 import Category from '@/components/Category/index.vue'
 import useCategoryStore from '@/stores/modules/category'
-import { reqHasSpu, reqAllTradeMark } from '@/api/product/spu'
+import { reqHasSpu } from '@/api/product/spu'
 import spuForm from './spuForm.vue'
+import skuForm from './skuForm.vue'
 const scene = ref(0)
 const categoryStore = useCategoryStore()
 //分页器默认页码
@@ -115,6 +123,15 @@ const changeScene = (obj) => {
 const updateSpu = (row) => {
   scene.value = 1
   spu.value.initHasSpuData(row)
+}
+
+const sku = ref()
+//添加SKU按钮的回调
+const addSku = (row) => {
+  //点击添加SKU按钮切换场景为2
+  scene.value = 2
+  //调用子组件的方法初始化添加SKU的数据
+  sku.value.initSkuData(categoryStore.c1Id, categoryStore.c2Id, row)
 }
 </script>
 
