@@ -53,21 +53,32 @@
         <el-table-column label="销售属性值">
           <template #default="{ row }">
             <el-tag
+              closable
               style="margin: 0 5px"
               v-for="(item, index) in row.spuSaleAttrValueList"
               :key="index"
               >{{ item.saleAttrValueName }}</el-tag
             >
             <el-input
+              v-if="row.flag == true"
               v-model="row.saleAttrValue"
               placeholder="请你输入属性值"
               size="small"
               style="width: 100px"
             ></el-input>
-            <el-button type="primary" size="small" icon="Plus"></el-button>
+            <el-button v-else type="primary" size="small" icon="Plus"></el-button>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="120px"></el-table-column>
+        <el-table-column label="操作" width="120px">
+          <template #default="{ $index }">
+            <el-button
+              @click="saleAttr.splice($index, 1)"
+              type="primary"
+              size="small"
+              icon="Delete"
+            ></el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </el-form-item>
     <el-form-item>
@@ -124,9 +135,9 @@ const initHasSpuData = async (spu) => {
     }
   })
   //存储已有的SPU销售属性
-  saleAttr.value = res2.data
+  saleAttr.value = res3.data
   //存储全部的SPU销售属性
-  allSaleAttr.value = res3.data
+  allSaleAttr.value = res4.data
 }
 
 const handlePictureCardPreview = (file) => {
