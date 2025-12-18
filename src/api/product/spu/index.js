@@ -28,3 +28,9 @@ export const reqHasSpu = (page, limit, category3Id) => {
 }
 //获取全部的SPU的品牌的数据
 export const reqAllTradeMark = () => request.get(API.ALLSALEATTR_URL)
+//获取某个已有的SPU下全部商品的图片地址
+export const reqSpuImageList = (spuId) => request.get(API.IMAGE_URL + spuId)
+//获取某个已有的SPU 拥有多少个销售属性
+export const reqSpuHasSaleAttr = (spuId) => request.get(API.SPUHASSALEATTR_URL + spuId)
+//获取全部的销售属性
+export const reqAllSaleAttr = () => request.get(API.ALLSALEATTR_URL)
