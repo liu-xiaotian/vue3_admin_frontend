@@ -1,10 +1,14 @@
 <template>
   <el-form label-width="100px">
     <el-form-item label="SPU名称">
-      <el-input placeholder="请你输入SPU名称" v-model="SpuParams.spuName"></el-input>
+      <el-input
+        style="width: 200px"
+        placeholder="请你输入SPU名称"
+        v-model="SpuParams.spuName"
+      ></el-input>
     </el-form-item>
     <el-form-item label="SPU品牌">
-      <el-select v-model="SpuParams.tmId">
+      <el-select v-model="SpuParams.tmId" style="width: 200px">
         <el-option
           v-for="item in AllTradeMark"
           :key="item.id"
@@ -37,14 +41,26 @@
         <img :src="dialogImageUrl" alt="Preview Image" style="width: 100%; height: 100%" />
       </el-dialog>
     </el-form-item>
-    <el-form-item label="SPU销售属性"></el-form-item>
-    <el-form-item>
-      <el-button type="primary" size="default">保存</el-button>
-      <el-button type="primary" size="default">取消</el-button>
-    </el-form-item>
     <el-form-item label="SPU销售属性">
-      <el-select></el-select>
-      <el-button style="margin-left: 10px" type="primary" size="default" icon="Plus"
+      <el-select
+        style="width: 200px"
+        v-model="saleAttrIdAndValueName"
+        :placeholder="unSelectSaleAttr.length ? `还未选择${unSelectSaleAttr.length}个` : '无'"
+      >
+        <el-option
+          :label="item.name"
+          :value="`${item.id}:${item.name}`"
+          v-for="item in unSelectSaleAttr"
+          :key="item.id"
+        ></el-option>
+      </el-select>
+      <el-button
+        @click="addSaleAttr"
+        :disabled="saleAttrIdAndValueName ? false : true"
+        style="margin-left: 10px"
+        type="primary"
+        size="default"
+        icon="Plus"
         >添加属性</el-button
       >
       <el-table border style="margin: 10px 0px" :data="saleAttr">
@@ -53,6 +69,7 @@
         <el-table-column label="销售属性值">
           <template #default="{ row }">
             <el-tag
+              @close="row.spuSaleAttrValueList.splice(index, 1)"
               closable
               style="margin: 0 5px"
               v-for="(item, index) in row.spuSaleAttrValueList"
@@ -60,13 +77,20 @@
               >{{ item.saleAttrValueName }}</el-tag
             >
             <el-input
+              @blur="toLook(row)"
               v-if="row.flag == true"
               v-model="row.saleAttrValue"
               placeholder="请你输入属性值"
               size="small"
               style="width: 100px"
             ></el-input>
-            <el-button v-else type="primary" size="small" icon="Plus"></el-button>
+            <el-button
+              @click="toEdit(row)"
+              v-else
+              type="primary"
+              size="small"
+              icon="Plus"
+            ></el-button>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="120px">
@@ -89,7 +113,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import {
   reqAllTradeMark,
   reqSpuImageList,
@@ -116,6 +140,8 @@ let allSaleAttr = ref([])
 let dialogVisible = ref(false)
 //存储预览图片地址
 let dialogImageUrl = ref('')
+//将来收集还未选择的销售属性的ID与属性值的名字
+let saleAttrIdAndValueName = ref('')
 const cancel = () => {
   $emit('changeScene', 0)
 }
@@ -169,6 +195,58 @@ const handlerUpload = (file) => {
 defineExpose({
   initHasSpuData
 })
+// 计算出当前还未拥有的销售属性
+const unSelectSaleAttr = computed(() => {
+  let unSelectArr = allSaleAttr.value.filter((item) => {
+    return saleAttr.value.every((item1) => {
+      return item.name != item1.saleAttrName
+    })
+  })
+  return unSelectArr
+})
+//添加销售属性的方法
+const addSaleAttr = () => {
+  const [baseSaleAttrId, saleAttrName] = saleAttrIdAndValueName.value.split(':')
+  let newSaleAttr = {
+    baseSaleAttrId,
+    saleAttrName,
+    spuSaleAttrValueList: []
+  }
+  saleAttr.value.push(newSaleAttr)
+  saleAttrIdAndValueName.value = ''
+}
+const toEdit = (row) => {
+  row.flag = true
+  row.saleAttrValue = ''
+}
+const toLook = (row) => {
+  const { baseSaleAttrId, saleAttrValue } = row
+  let newSaleAttrValue = {
+    baseSaleAttrId,
+    saleAttrValueName: saleAttrValue
+  }
+  if (saleAttrValue.trim() == '') {
+    ElMessage({
+      type: 'error',
+      message: '属性值不能为空的'
+    })
+    return
+  }
+  let repeat = row.spuSaleAttrValueList.find((item) => {
+    return item.saleAttrValueName == saleAttrValue
+  })
+  if (repeat) {
+    ElMessage({
+      type: 'error',
+      message: '属性值重复'
+    })
+    return
+  }
+  //追加新的属性值对象
+  row.spuSaleAttrValueList.push(newSaleAttrValue)
+  //切换为查看模式
+  row.flag = false
+}
 </script>
 
 <style lang="scss" scoped></style>
