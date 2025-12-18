@@ -68,6 +68,8 @@ let records = ref([])
 let total = ref(0)
 // 1. 定义一个名字与模板中 ref 属性相同的变量
 const spu = ref(null)
+//存储已有的SPU这些数据
+let AllTradeMark = ref([])
 //此方法执行:可以获取某一个三级分类下全部的已有的SPU
 const getHasSpu = async (pager = 1) => {
   //修改当前页码
@@ -94,11 +96,20 @@ const changeSize = () => {
 
 // 添加spu（显示组件）
 const addSpu = () => {
+  //切换为场景1:添加与修改已有SPU结构->SpuForm
   scene.value = 1
+  //点击添加SPU按钮,调用子组件的方法初始化数据
+  spu.value.initAddSpu(categoryStore.c3Id)
 }
 // 子组件spuForm绑定自定义事件
-const changeScene = (num) => {
-  scene.value = num
+const changeScene = (obj) => {
+  //子组件Spuform点击取消变为场景0:展示已有的SPU
+  scene.value = obj.flag
+  if (obj.params == 'update') {
+    getHasSpu(pageNo.value)
+  } else {
+    getHasSpu()
+  }
 }
 // 修改SPU
 const updateSpu = (row) => {

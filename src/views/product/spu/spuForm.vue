@@ -118,7 +118,8 @@ import {
   reqAllTradeMark,
   reqSpuImageList,
   reqSpuHasSaleAttr,
-  reqAllSaleAttr
+  reqAllSaleAttr,
+  reqAddOrUpdateSpu
 } from '@/api/product/spu'
 let $emit = defineEmits(['changeScene'])
 let SpuParams = ref({
@@ -143,7 +144,7 @@ let dialogImageUrl = ref('')
 //将来收集还未选择的销售属性的ID与属性值的名字
 let saleAttrIdAndValueName = ref('')
 const cancel = () => {
-  $emit('changeScene', 0)
+  $emit('changeScene', { flag: 0, params: 'update' })
 }
 const initHasSpuData = async (spu) => {
   SpuParams.value = spu
@@ -192,9 +193,7 @@ const handlerUpload = (file) => {
     return false
   }
 }
-defineExpose({
-  initHasSpuData
-})
+
 // 计算出当前还未拥有的销售属性
 const unSelectSaleAttr = computed(() => {
   let unSelectArr = allSaleAttr.value.filter((item) => {
@@ -208,7 +207,7 @@ const unSelectSaleAttr = computed(() => {
 const addSaleAttr = () => {
   const [baseSaleAttrId, saleAttrName] = saleAttrIdAndValueName.value.split(':')
   let newSaleAttr = {
-    baseSaleAttrId,
+    baseSaleAttrId: Number(baseSaleAttrId),
     saleAttrName,
     spuSaleAttrValueList: []
   }
@@ -222,7 +221,7 @@ const toEdit = (row) => {
 const toLook = (row) => {
   const { baseSaleAttrId, saleAttrValue } = row
   let newSaleAttrValue = {
-    baseSaleAttrId,
+    baseSaleAttrId: Number(baseSaleAttrId),
     saleAttrValueName: saleAttrValue
   }
   if (saleAttrValue.trim() == '') {
@@ -247,6 +246,65 @@ const toLook = (row) => {
   //切换为查看模式
   row.flag = false
 }
+//保存按钮的回调
+const save = async () => {
+  // 1. 整理照片墙数据
+  SpuParams.value.spuImageList = imgList.value.map((item) => {
+    return {
+      imgName: item.name,
+      // 兼容新上传的图片和服务器返回的旧图片
+      imgUrl: (item.response && item.response.data) || item.url
+    }
+  })
+
+  // 2. 整理销售属性
+  SpuParams.value.spuSaleAttrList = saleAttr.value
+
+  // 3. 发送请求
+  try {
+    let result = await reqAddOrUpdateSpu(SpuParams.value)
+    console.log(SpuParams.value)
+
+    if (result.code == 200) {
+      ElMessage.success(SpuParams.value.id ? '更新成功' : '添加成功')
+      // 通知父组件切换场景，flag:0 回到列表
+      $emit('changeScene', { flag: 0, params: SpuParams.value.id ? 'update' : 'add' })
+    } else {
+      ElMessage.error(SpuParams.value.id ? '更新失败' : '添加失败')
+    }
+  } catch (error) {
+    ElMessage.error('系统错误，请检查网络')
+  }
+}
+//添加一个新的SPU初始化请求方法
+const initAddSpu = async (c3Id) => {
+  //清空数据
+  Object.assign(SpuParams.value, {
+    category3Id: '', //收集三级分类的ID
+    spuName: '', //SPU的名字
+    description: '', //SPU的描述
+    tmId: '', //品牌的ID
+    spuImageList: [],
+    spuSaleAttrList: []
+  })
+  //清空照片
+  imgList.value = []
+  //清空销售属性
+  saleAttr.value = []
+  saleAttrIdAndValueName.value = ''
+  //存储三级分类的ID
+  SpuParams.value.category3Id = c3Id
+  //获取全部品牌的数据
+  let result = await reqAllTradeMark()
+  let result1 = await reqAllSaleAttr()
+  //存储数据
+  AllTradeMark.value = result.data
+  allSaleAttr.value = result1.data
+}
+defineExpose({
+  initHasSpuData,
+  initAddSpu
+})
 </script>
 
 <style lang="scss" scoped></style>

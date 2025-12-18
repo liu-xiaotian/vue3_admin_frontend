@@ -27,10 +27,21 @@ export const reqHasSpu = (page, limit, category3Id) => {
   return request.get(API.HASSPU_URL + `${page}/${limit}?category3Id=${category3Id}`)
 }
 //获取全部的SPU的品牌的数据
-export const reqAllTradeMark = () => request.get(API.ALLSALEATTR_URL)
+export const reqAllTradeMark = () => request.get(API.ALLTRADEMARK_URL)
 //获取某个已有的SPU下全部商品的图片地址
 export const reqSpuImageList = (spuId) => request.get(API.IMAGE_URL + spuId)
 //获取某个已有的SPU 拥有多少个销售属性
 export const reqSpuHasSaleAttr = (spuId) => request.get(API.SPUHASSALEATTR_URL + spuId)
 //获取全部的销售属性
 export const reqAllSaleAttr = () => request.get(API.ALLSALEATTR_URL)
+//添加一个新的SPU的
+//更新已有的SPU接口
+//data:即为新增的SPU|或者已有的SPU对象
+export const reqAddOrUpdateSpu = (data) => {
+  //如果SPU对象拥有ID,更新已有的SPU
+  if (data.id) {
+    return request.post(API.UPDATESPU_URL, data)
+  } else {
+    return request.post(API.ADDSPU_URL, data)
+  }
+}
