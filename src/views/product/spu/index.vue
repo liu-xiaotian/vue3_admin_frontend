@@ -30,7 +30,13 @@
               title="修改SPU"
               @click="updateSpu(row)"
             ></el-button>
-            <el-button type="primary" size="small" icon="View" title="查看SKU列表"></el-button>
+            <el-button
+              @click="findSku(row)"
+              type="primary"
+              size="small"
+              icon="View"
+              title="查看SKU列表"
+            ></el-button>
             <el-popconfirm>
               <template #reference>
                 <el-button type="primary" size="small" icon="Delete" title="删除SPU"></el-button>
@@ -54,6 +60,19 @@
     </div>
     <spuForm ref="spu" v-show="scene == 1" @changeScene="changeScene"></spuForm>
     <skuForm ref="sku" v-show="scene == 2" @changeScene="changeScene"></skuForm>
+    <!-- dialog对话框:展示已有的SKU数据 -->
+    <el-dialog v-model="show" title="SKU列表">
+      <el-table border :data="skuArr">
+        <el-table-column label="SKU名字" prop="skuName"></el-table-column>
+        <el-table-column label="SKU价格" prop="price"></el-table-column>
+        <el-table-column label="SKU重量" prop="weight"></el-table-column>
+        <el-table-column label="SKU图片">
+          <template #default="{ row }">
+            <img :src="row.skuDefaultImg" style="width: 100px; height: 100px" />
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -61,7 +80,7 @@
 import { ref, watch } from 'vue'
 import Category from '@/components/Category/index.vue'
 import useCategoryStore from '@/stores/modules/category'
-import { reqHasSpu } from '@/api/product/spu'
+import { reqHasSpu, reqSkuList } from '@/api/product/spu'
 import spuForm from './spuForm.vue'
 import skuForm from './skuForm.vue'
 const scene = ref(0)
@@ -76,8 +95,9 @@ let records = ref([])
 let total = ref(0)
 // 1. 定义一个名字与模板中 ref 属性相同的变量
 const spu = ref(null)
-//存储已有的SPU这些数据
-let AllTradeMark = ref([])
+const show = ref(false)
+//存储全部的SKU数据
+let skuArr = ref([])
 //此方法执行:可以获取某一个三级分类下全部的已有的SPU
 const getHasSpu = async (pager = 1) => {
   //修改当前页码
@@ -132,6 +152,14 @@ const addSku = (row) => {
   scene.value = 2
   //调用子组件的方法初始化添加SKU的数据
   sku.value.initSkuData(categoryStore.c1Id, categoryStore.c2Id, row)
+}
+//查看SKU列表的数据
+const findSku = async (row) => {
+  let res = await reqSkuList(row.id)
+  if (res.code == 200) {
+    skuArr.value = res.data
+    show.value = true
+  }
 }
 </script>
 

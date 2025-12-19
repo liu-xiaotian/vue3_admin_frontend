@@ -152,7 +152,7 @@ const save = async () => {
     return prev
   }, [])
   //销售属性
-  skuParams.skuSaleAttrValueList = saleArr.value.reduce((prev, next) => {
+  skuParams.skuSaleAttrValueList = saleArr.value.reduce((prev) => {
     if (next.saleIdAndValueId) {
       let [saleAttrId, saleAttrValueId] = next.saleIdAndValueId.split(':')
       prev.push({
