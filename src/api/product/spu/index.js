@@ -49,3 +49,5 @@ export const reqAddOrUpdateSpu = (data) => {
 export const reqAddSku = (data) => request.post(API.ADDSKU_URL, data)
 //获取SKU数据
 export const reqSkuList = (spuId) => request.get(API.SKUINFO_URL + spuId)
+//删除spu数据
+export const reqRemoveSpu = (spuId) => request.delete(API.REMOVESPU_URL + spuId)

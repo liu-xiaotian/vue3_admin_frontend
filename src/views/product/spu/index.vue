@@ -37,7 +37,11 @@
               icon="View"
               title="查看SKU列表"
             ></el-button>
-            <el-popconfirm>
+            <el-popconfirm
+              :title="`你确定删除${row.spuName}?`"
+              width="200px"
+              @confirm="deleteSpu(row)"
+            >
               <template #reference>
                 <el-button type="primary" size="small" icon="Delete" title="删除SPU"></el-button>
               </template>
@@ -77,10 +81,10 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onBeforeUnmount } from 'vue'
 import Category from '@/components/Category/index.vue'
 import useCategoryStore from '@/stores/modules/category'
-import { reqHasSpu, reqSkuList } from '@/api/product/spu'
+import { reqHasSpu, reqRemoveSpu, reqSkuList } from '@/api/product/spu'
 import spuForm from './spuForm.vue'
 import skuForm from './skuForm.vue'
 const scene = ref(0)
@@ -161,6 +165,27 @@ const findSku = async (row) => {
     show.value = true
   }
 }
+//删除已有的SPU按钮的回调
+const deleteSpu = async (row) => {
+  let res = await reqRemoveSpu(row.id)
+  if (res.code == 200) {
+    ElMessage({
+      type: 'success',
+      message: '删除成功'
+    })
+    //获取剩余SPU数据
+    getHasSpu(records.value.length > 1 ? pageNo.value : pageNo.value - 1)
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '删除失败'
+    })
+  }
+}
+//路由组件销毁前，情况仓库关于分类的数据
+onBeforeUnmount(() => {
+  categoryStore.$reset()
+})
 </script>
 
 <style lang="scss" scoped></style>
