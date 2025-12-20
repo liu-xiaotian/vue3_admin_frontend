@@ -18,3 +18,11 @@ const API = {
 export const reqAllRoleList = (page, limit, roleName) => {
   return request.get(API.ADDROLE_URL + `${page}/${limit}?roleName=${roleName}`)
 }
+// 添加职位与更新已有职位
+export const reqAddOrUpdateRole = (data) => {
+  if (data.id) {
+    return request.put(API.UPDATEROLE_URL, data)
+  } else {
+    return request.post(API.ADDROLE_URL, data)
+  }
+}

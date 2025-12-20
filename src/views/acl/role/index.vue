@@ -67,12 +67,25 @@
       @size-change="sizeChange"
     />
   </el-card>
+  <!-- 添加职位与更新已有职位的结构:对话框 -->
+  <el-dialog v-model="dialogVisite" :title="RoleParams.id ? '更新职位' : '添加职位'">
+    <el-form :model="RoleParams" :rules="rules" ref="form">
+      <el-form-item label="职位名称" prop="roleName">
+        <el-input placeholder="请你输入职位名称" v-model="RoleParams.roleName"></el-input>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button type="primary" size="default" @click="dialogVisite = false">取消</el-button>
+      <el-button type="primary" size="default" @click="save">确定</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
 import useLayOutSettingStore from '@/stores/modules/setting'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive, nextTick } from 'vue'
 import { reqAllRoleList } from '@/api/acl/role'
+import { reqAddOrUpdateRole } from '@/api/acl/role'
 const settingStore = useLayOutSettingStore()
 //当前页码
 let pageNo = ref(1)
@@ -84,6 +97,14 @@ let keyword = ref('')
 let allRole = ref([])
 //职位总个数
 let total = ref(0)
+//控制添加dialog显示
+let dialogVisite = ref(false)
+//收集新增岗位数据
+let RoleParams = reactive({
+  roleName: ''
+})
+//获取form实例
+let form = ref()
 //获取全部用户信息的方法
 const getHasRole = async (pager = 1) => {
   pageNo.value = pager
@@ -111,6 +132,50 @@ const search = () => {
 //重置按钮的回调
 const reset = () => {
   settingStore.refsh = !settingStore.refsh
+}
+
+//添加
+const addRole = () => {
+  ;((dialogVisite.value = true),
+    // 清空数据
+    Object.assign(RoleParams, {
+      roleName: '',
+      id: 0
+    }))
+  // 清空上一次表单校验错误结果
+  nextTick(() => {
+    form.value.clearValidate('roleName')
+  })
+}
+const validatorRoleName = (rule, value, callback) => {
+  if (value.trim().length >= 2) {
+    callback()
+  } else {
+    callback(new Error('职位名称至少两个字符'))
+  }
+}
+const rules = {
+  roleName: [{ required: true, trigger: 'blur', validator: validatorRoleName }]
+}
+
+const save = async () => {
+  await form.value.validate()
+  let res = await reqAddOrUpdateRole(RoleParams)
+
+  if (res.code == 200) {
+    ElMessage({ type: 'success', message: RoleParams.id ? '更新成功' : '添加成功' })
+    dialogVisite.value = false
+    getHasRole(RoleParams.id ? pageNo.value : 1)
+  }
+}
+
+//编辑职位，更新已有
+const updateRole = (row) => {
+  dialogVisite.value = true
+  Object.assign(RoleParams, row)
+  nextTick(() => {
+    form.value.clearValidate('roleName')
+  })
 }
 </script>
 
