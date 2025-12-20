@@ -106,6 +106,39 @@
       </div>
     </template>
   </el-drawer>
+  <!-- 抽屉结构:用户某一个已有的账号进行职位分配 -->
+  <el-drawer v-model="drawer1">
+    <template #header>
+      <h4>分配角色(职位)</h4>
+    </template>
+    <template #default>
+      <el-form>
+        <el-form-item label="用户姓名">
+          <el-input v-model="userParams.username" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="职位列表">
+          <el-checkbox
+            @change="handleCheckAllChange"
+            v-model="checkAll"
+            :indeterminate="isIndeterminate"
+            >全选</el-checkbox
+          >
+          <!-- 显示职位的的复选框 -->
+          <el-checkbox-group v-model="userRole" @change="handleCheckedCitiesChange">
+            <el-checkbox v-for="(role, index) in allRole" :key="index" :label="role">{{
+              role.roleName
+            }}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </el-form>
+    </template>
+    <template #footer>
+      <div style="flex: auto">
+        <el-button @click="drawer1 = false">取消</el-button>
+        <el-button type="primary" @click="confirmClick">确定</el-button>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <script setup>
@@ -130,6 +163,7 @@ let userParams = reactive({
   password: ''
 })
 let formRef = ref()
+let drawer1 = ref(false)
 //获取全部已有的用户信息
 const getHasUser = async (pager = 1) => {
   //收集当前页码
@@ -228,6 +262,10 @@ const updateUser = (row) => {
     formRef.value.clearValidate('username')
     formRef.value.clearValidate('name')
   })
+}
+
+const setRole = (row) => {
+  drawer1.value = true
 }
 </script>
 
