@@ -109,7 +109,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, nextTick } from 'vue'
 import { reqUserInfo, reqAddOrUpdateUser } from '@/api/acl/user/index'
 //默认页码
 let pageNo = ref(1)
@@ -129,6 +129,7 @@ let userParams = reactive({
   name: '',
   password: ''
 })
+let formRef = ref()
 //获取全部已有的用户信息
 const getHasUser = async (pager = 1) => {
   //收集当前页码
@@ -148,12 +149,26 @@ onMounted(() => {
 const addUser = () => {
   //抽屉显示出来
   drawer.value = true
+  //清空数据
+  Object.assign(userParams, {
+    username: '',
+    name: '',
+    password: ''
+  })
+  //清除上一次的错误的提示信息
+  nextTick(() => {
+    formRef.value.clearValidate('username')
+    formRef.value.clearValidate('name')
+    formRef.value.clearValidate('password')
+  })
 }
 const cancel = () => {
   drawer.value = false
 }
 //保存按钮的回调
 const save = async () => {
+  //点击保存按钮的时候,务必需要保证表单全部复合条件在去发请求
+  await formRef.value.validate()
   let res = await reqAddOrUpdateUser(userParams)
   //添加或者更新成功
   if (res.code == 200) {
