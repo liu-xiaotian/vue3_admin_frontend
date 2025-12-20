@@ -172,6 +172,38 @@ const save = async () => {
     ElMessage({ type: 'error', message: userParams.id ? '更新失败' : '添加失败' })
   }
 }
+//校验用户名字回调函数
+const validatorUsername = (rule, value, callBack) => {
+  //用户名字|昵称,长度至少五位
+  if (value.trim().length >= 5) {
+    callBack()
+  } else {
+    callBack(new Error('用户名字至少五位'))
+  }
+}
+//校验用户名字回调函数
+const validatorname = (rule, value, callBack) => {
+  //用户名字|昵称,长度至少五位
+  if (value.trim().length >= 5) {
+    callBack()
+  } else {
+    callBack(new Error('用户昵称至少五位'))
+  }
+}
+const validatorPassword = (rule, value, callBack) => {
+  //用户名字|昵称,长度至少五位
+  if (value.trim().length >= 6) {
+    callBack()
+  } else {
+    callBack(new Error('用户密码至少六位'))
+  }
+}
+//表单校验规则对象
+const rules = {
+  username: [{ required: true, trigger: 'blur', validator: validatorUsername }],
+  name: [{ required: true, trigger: 'blur', validator: validatorname }],
+  password: [{ required: true, trigger: 'blur', validator: validatorPassword }]
+}
 </script>
 
 <style lang="scss" scoped>
