@@ -29,3 +29,9 @@ export const reqAddOrUpdateUser = (data) => {
     return request.post(API.ADDUSER_URL, data)
   }
 }
+
+//获取全部职位以及包含当前用户的已有的职位
+export const reqAllRole = (userId) => request.get(API.ALLROLEURL + userId)
+
+//分配职位
+export const reqSetUserRole = (data) => request.post(API.SETROLE_URL, data)

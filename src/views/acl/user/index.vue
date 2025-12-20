@@ -143,7 +143,7 @@
 
 <script setup>
 import { ref, onMounted, reactive, nextTick } from 'vue'
-import { reqUserInfo, reqAddOrUpdateUser } from '@/api/acl/user/index'
+import { reqUserInfo, reqAddOrUpdateUser, reqAllRole, reqSetUserRole } from '@/api/acl/user/index'
 //默认页码
 let pageNo = ref(1)
 //一页展示几条数据
@@ -164,6 +164,11 @@ let userParams = reactive({
 })
 let formRef = ref()
 let drawer1 = ref(false)
+//存储全部职位的数据
+let allRole = ref([])
+//当前用户已有的职位
+let userRole = ref([])
+
 //获取全部已有的用户信息
 const getHasUser = async (pager = 1) => {
   //收集当前页码
@@ -264,8 +269,52 @@ const updateUser = (row) => {
   })
 }
 
-const setRole = (row) => {
-  drawer1.value = true
+const setRole = async (row) => {
+  Object.assign(userParams, row)
+  let res = await reqAllRole(userParams.id)
+  if (res.code == 200) {
+    allRole.value = res.data.allRolesList
+    userRole.value = res.data.assignRoles
+    drawer1.value = true
+  }
+}
+
+//收集顶部复选框全选数据
+const checkAll = ref(false)
+//控制顶部全选复选框不确定的样式
+const isIndeterminate = ref(true)
+//顶部的全部复选框的change事件
+const handleCheckAllChange = (val) => {
+  //val:true(全选)|false(没有全选)
+  userRole.value = val ? allRole.value : []
+  //不确定的样式(确定样式)
+  isIndeterminate.value = false
+}
+//顶部全部的复选框的change事件
+const handleCheckedCitiesChange = (value) => {
+  //顶部复选框的勾选数据
+  //代表:勾选上的项目个数与全部的职位个数相等，顶部的复选框勾选上
+  checkAll.value = value.length === allRole.value.length
+  //不确定的样式
+  isIndeterminate.value = value.length !== allRole.value.length
+}
+//确定按钮的回调(分配职位)
+const confirmClick = async () => {
+  let data = {
+    userId: userParams.id,
+    roleIdList: userRole.value.map((item) => {
+      return item.id
+    })
+  }
+  let res = await reqSetUserRole(data)
+  if (res.code == 200) {
+    //提示信息
+    ElMessage({ type: 'success', message: '分配职务成功' })
+    //关闭抽屉
+    drawer1.value = false
+    //获取更新完毕用户的信息,更新完毕留在当前页
+    getHasUser(pageNo.value)
+  }
 }
 </script>
 
