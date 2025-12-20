@@ -21,3 +21,5 @@ const API = {
 // 获取用户账号信息的接口
 export const reqUserInfo = (page, limit, username) =>
   request.get(API.ALLUSER_URL + `${page}/${limit}?username=${username}`)
+
+export const reqAddOrUpdateUser = (data) => request.post(API.ADDUSER_URL, data)

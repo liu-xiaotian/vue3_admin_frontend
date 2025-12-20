@@ -110,7 +110,7 @@
 
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
-import { reqUserInfo } from '@/api/acl/user/index'
+import { reqUserInfo, reqAddOrUpdateUser } from '@/api/acl/user/index'
 //默认页码
 let pageNo = ref(1)
 //一页展示几条数据
@@ -148,6 +148,29 @@ onMounted(() => {
 const addUser = () => {
   //抽屉显示出来
   drawer.value = true
+}
+const cancel = () => {
+  drawer.value = false
+}
+//保存按钮的回调
+const save = async () => {
+  let res = await reqAddOrUpdateUser(userParams)
+  //添加或者更新成功
+  if (res.code == 200) {
+    //关闭抽屉
+    drawer.value = false
+    //提示消息
+    ElMessage({ type: 'success', message: userParams.id ? '更新成功' : '添加成功' })
+    //获取最新的全部账号的信息
+    // getHasUser(userParams.id ? pageNo.value : 1);
+    //浏览器自动刷新一次
+    window.location.reload()
+  } else {
+    //关闭抽屉
+    drawer.value = false
+    //提示消息
+    ElMessage({ type: 'error', message: userParams.id ? '更新失败' : '添加失败' })
+  }
 }
 </script>
 
