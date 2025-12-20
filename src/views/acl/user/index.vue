@@ -151,6 +151,7 @@ const addUser = () => {
   drawer.value = true
   //清空数据
   Object.assign(userParams, {
+    id: 0,
     username: '',
     name: '',
     password: ''
@@ -199,10 +200,10 @@ const validatorUsername = (rule, value, callBack) => {
 //校验用户名字回调函数
 const validatorname = (rule, value, callBack) => {
   //用户名字|昵称,长度至少五位
-  if (value.trim().length >= 5) {
+  if (value.trim().length >= 3) {
     callBack()
   } else {
-    callBack(new Error('用户昵称至少五位'))
+    callBack(new Error('用户昵称至少三位'))
   }
 }
 const validatorPassword = (rule, value, callBack) => {
@@ -218,6 +219,15 @@ const rules = {
   username: [{ required: true, trigger: 'blur', validator: validatorUsername }],
   name: [{ required: true, trigger: 'blur', validator: validatorname }],
   password: [{ required: true, trigger: 'blur', validator: validatorPassword }]
+}
+
+const updateUser = (row) => {
+  drawer.value = true
+  Object.assign(userParams, row)
+  nextTick(() => {
+    formRef.value.clearValidate('username')
+    formRef.value.clearValidate('name')
+  })
 }
 </script>
 

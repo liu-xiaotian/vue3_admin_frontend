@@ -22,4 +22,10 @@ const API = {
 export const reqUserInfo = (page, limit, username) =>
   request.get(API.ALLUSER_URL + `${page}/${limit}?username=${username}`)
 
-export const reqAddOrUpdateUser = (data) => request.post(API.ADDUSER_URL, data)
+export const reqAddOrUpdateUser = (data) => {
+  if (data.id) {
+    return request.put(API.UPDATEUSER_URL, data)
+  } else {
+    return request.post(API.ADDUSER_URL, data)
+  }
+}
