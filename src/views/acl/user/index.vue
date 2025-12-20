@@ -12,8 +12,14 @@
   </el-card>
   <el-card style="margin: 10px 0">
     <el-button @click="addUser" type="primary" size="default">添加用户</el-button>
-    <el-button type="primary" size="default">批量删除</el-button>
-    <el-table :data="userArr" style="margin: 10px 0" border>
+    <el-button
+      @click="deleteSelectUser"
+      :disabled="selectIdArr.length ? false : true"
+      type="primary"
+      size="default"
+      >批量删除</el-button
+    >
+    <el-table @selection-change="selectChange" :data="userArr" style="margin: 10px 0" border>
       <el-table-column type="selection" align="center"></el-table-column>
       <el-table-column label="#" align="center" type="index"></el-table-column>
       <el-table-column label="ID" align="center" prop="id"></el-table-column>
@@ -143,7 +149,14 @@
 
 <script setup>
 import { ref, onMounted, reactive, nextTick } from 'vue'
-import { reqUserInfo, reqAddOrUpdateUser, reqAllRole, reqSetUserRole } from '@/api/acl/user/index'
+import {
+  reqUserInfo,
+  reqAddOrUpdateUser,
+  reqAllRole,
+  reqSetUserRole,
+  reqRemoveUser,
+  reqSelectUser
+} from '@/api/acl/user/index'
 //默认页码
 let pageNo = ref(1)
 //一页展示几条数据
@@ -314,6 +327,31 @@ const confirmClick = async () => {
     drawer1.value = false
     //获取更新完毕用户的信息,更新完毕留在当前页
     getHasUser(pageNo.value)
+  }
+}
+
+//删除某个用户
+const deleteUser = async (userId) => {
+  let res = await reqRemoveUser(userId)
+  if (res.code == 200) {
+    ElMessage({ type: 'success', message: '删除成功' })
+    getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+  }
+}
+//准备一个数组存储批量删除的用户的ID
+let selectIdArr = ref([])
+//table 复选框勾选的时候会触发的事件
+const selectChange = (value) => {
+  selectIdArr.value = value
+}
+const deleteSelectUser = async () => {
+  let idsList = selectIdArr.value.map((item) => {
+    return item.id
+  })
+  let res = await reqSelectUser(idsList)
+  if (res.code == 200) {
+    ElMessage({ type: 'success', message: '删除成功' })
+    getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
   }
 }
 </script>

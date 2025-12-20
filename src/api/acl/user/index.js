@@ -35,3 +35,8 @@ export const reqAllRole = (userId) => request.get(API.ALLROLEURL + userId)
 
 //分配职位
 export const reqSetUserRole = (data) => request.post(API.SETROLE_URL, data)
+
+//删除某一个账号的信息
+export const reqRemoveUser = (userId) => request.delete(API.DELETEUSER_URL + userId)
+//批量删除的接口
+export const reqSelectUser = (idList) => request.delete(API.DELETEALLUSER_URL, { data: idList })
