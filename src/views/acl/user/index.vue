@@ -2,11 +2,13 @@
   <el-card>
     <el-form :inline="true" class="form">
       <el-form-item label="用户名:">
-        <el-input placeholder="请你输入搜索用户名"></el-input>
+        <el-input v-model="keyword" placeholder="请你输入搜索用户名"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" size="default">搜索</el-button>
-        <el-button type="primary" size="default">重置</el-button>
+        <el-button :disabled="keyword ? false : true" @click="search" type="primary" size="default"
+          >搜索</el-button
+        >
+        <el-button @click="reset" type="primary" size="default">重置</el-button>
       </el-form-item>
     </el-form>
   </el-card>
@@ -148,6 +150,7 @@
 </template>
 
 <script setup>
+import useLayOutSettingStore from '@/stores/modules/setting'
 import { ref, onMounted, reactive, nextTick } from 'vue'
 import {
   reqUserInfo,
@@ -353,6 +356,20 @@ const deleteSelectUser = async () => {
     ElMessage({ type: 'success', message: '删除成功' })
     getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
   }
+}
+
+//获取模板setting仓库
+let settingStore = useLayOutSettingStore()
+//搜索按钮的回调
+const search = () => {
+  //根据关键字获取相应的用户数据
+  getHasUser()
+  //清空关键字
+  keyword.value = ''
+}
+//重置按钮
+const reset = () => {
+  settingStore.refsh = !settingStore.refsh
 }
 </script>
 
