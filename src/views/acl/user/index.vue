@@ -1,5 +1,5 @@
 <template>
-  <el-card style="height: 80px">
+  <el-card>
     <el-form :inline="true" class="form">
       <el-form-item label="用户名:">
         <el-input placeholder="请你输入搜索用户名"></el-input>
@@ -11,7 +11,7 @@
     </el-form>
   </el-card>
   <el-card style="margin: 10px 0">
-    <el-button type="primary" size="default">添加用户</el-button>
+    <el-button @click="addUser" type="primary" size="default">添加用户</el-button>
     <el-button type="primary" size="default">批量删除</el-button>
     <el-table :data="userArr" style="margin: 10px 0" border>
       <el-table-column type="selection" align="center"></el-table-column>
@@ -79,10 +79,37 @@
       @size-change="handler"
     />
   </el-card>
+  <!-- 抽屉结构:完成添加新的用户账号|更新已有的账号信息 -->
+  <el-drawer v-model="drawer">
+    <!-- 头部标题:将来文字内容应该动态的 -->
+    <template #header>
+      <h4>{{ userParams.id ? '更新用户' : '添加用户' }}</h4>
+    </template>
+    <!-- 身体部分 -->
+    <template #default>
+      <el-form :model="userParams" :rules="rules" ref="formRef">
+        <el-form-item label="用户姓名" prop="username">
+          <el-input placeholder="请您输入用户姓名" v-model="userParams.username"></el-input>
+        </el-form-item>
+        <el-form-item label="用户昵称" prop="name">
+          <el-input placeholder="请您输入用户昵称" v-model="userParams.name"></el-input>
+        </el-form-item>
+        <el-form-item label="用户密码" prop="password" v-if="!userParams.id">
+          <el-input placeholder="请您输入用户密码" v-model="userParams.password"></el-input>
+        </el-form-item>
+      </el-form>
+    </template>
+    <template #footer>
+      <div style="flex: auto">
+        <el-button @click="cancel">取消</el-button>
+        <el-button type="primary" @click="save">确定</el-button>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { reqUserInfo } from '@/api/acl/user/index'
 //默认页码
 let pageNo = ref(1)
@@ -94,7 +121,14 @@ let total = ref(0)
 let userArr = ref([])
 //定义响应式数据:收集用户输入进来的关键字
 let keyword = ref('')
-
+//定义响应式数据控制抽屉的显示与隐藏
+let drawer = ref(false)
+//收集用户信息的响应式数据
+let userParams = reactive({
+  username: '',
+  name: '',
+  password: ''
+})
 //获取全部已有的用户信息
 const getHasUser = async (pager = 1) => {
   //收集当前页码
@@ -109,6 +143,12 @@ const getHasUser = async (pager = 1) => {
 onMounted(() => {
   getHasUser()
 })
+
+//添加用户按钮的回调
+const addUser = () => {
+  //抽屉显示出来
+  drawer.value = true
+}
 </script>
 
 <style lang="scss" scoped>
