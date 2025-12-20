@@ -69,7 +69,50 @@
   </el-card>
 </template>
 
-<script setup></script>
+<script setup>
+import useLayOutSettingStore from '@/stores/modules/setting'
+import { ref, onMounted } from 'vue'
+import { reqAllRoleList } from '@/api/acl/role'
+const settingStore = useLayOutSettingStore()
+//当前页码
+let pageNo = ref(1)
+//一页展示几条数据
+let pageSize = ref(10)
+//搜索职位关键字
+let keyword = ref('')
+//存储全部已有的职位
+let allRole = ref([])
+//职位总个数
+let total = ref(0)
+//获取全部用户信息的方法
+const getHasRole = async (pager = 1) => {
+  pageNo.value = pager
+  let res = await reqAllRoleList(pageNo.value, pageSize.value, keyword.value)
+  if (res.code == 200) {
+    total.value = res.data.total
+    allRole.value = res.data.records
+  }
+}
+//组件挂载完毕
+onMounted(() => {
+  //获取职位请求
+  getHasRole()
+})
+//下拉菜单的回调
+const sizeChange = () => {
+  getHasRole()
+}
+//搜索按钮的回调
+const search = () => {
+  //再次发请求根据关键字
+  getHasRole()
+  keyword.value = ''
+}
+//重置按钮的回调
+const reset = () => {
+  settingStore.refsh = !settingStore.refsh
+}
+</script>
 
 <style lang="scss" scoped>
 .form {
