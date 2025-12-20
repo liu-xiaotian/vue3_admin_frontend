@@ -13,7 +13,7 @@
   <el-card style="margin: 10px 0">
     <el-button type="primary" size="default">添加用户</el-button>
     <el-button type="primary" size="default">批量删除</el-button>
-    <el-table style="margin: 10px 0" border>
+    <el-table :data="userArr" style="margin: 10px 0" border>
       <el-table-column type="selection" align="center"></el-table-column>
       <el-table-column label="#" align="center" type="index"></el-table-column>
       <el-table-column label="ID" align="center" prop="id"></el-table-column>
@@ -81,7 +81,35 @@
   </el-card>
 </template>
 
-<script setup></script>
+<script setup>
+import { ref, onMounted } from 'vue'
+import { reqUserInfo } from '@/api/acl/user/index'
+//默认页码
+let pageNo = ref(1)
+//一页展示几条数据
+let pageSize = ref(5)
+//用户总个数
+let total = ref(0)
+//存储全部用户的数组
+let userArr = ref([])
+//定义响应式数据:收集用户输入进来的关键字
+let keyword = ref('')
+
+//获取全部已有的用户信息
+const getHasUser = async (pager = 1) => {
+  //收集当前页码
+  pageNo.value = pager
+  let result = await reqUserInfo(pageNo.value, pageSize.value, keyword.value)
+  if (result.code == 200) {
+    total.value = result.data.total
+    userArr.value = result.data.records
+  }
+}
+//组件挂载完毕
+onMounted(() => {
+  getHasUser()
+})
+</script>
 
 <style lang="scss" scoped>
 .form {
