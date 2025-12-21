@@ -111,7 +111,8 @@ import {
   reqAllRoleList,
   reqAddOrUpdateRole,
   reqAllMenuList,
-  reqSetPermisstion
+  reqSetPermisstion,
+  reqRemoveRole
 } from '@/api/acl/role'
 const settingStore = useLayOutSettingStore()
 //当前页码
@@ -246,6 +247,15 @@ const handler = async () => {
     drawer.value = false
     ElMessage({ type: 'success', message: '分配权限成功' })
     window.location.reload()
+  }
+}
+//删除已有的职位
+const removeRole = async (id) => {
+  let result = await reqRemoveRole(id)
+  if (result.code == 200) {
+    //提示信息
+    ElMessage({ type: 'success', message: '删除成功' })
+    getHasRole(allRole.value.length > 1 ? pageNo.value : pageNo.value - 1)
   }
 }
 </script>
