@@ -79,13 +79,40 @@
       <el-button type="primary" size="default" @click="save">确定</el-button>
     </template>
   </el-dialog>
+  <!-- 抽屉组件:分配职位的菜单权限与按钮的权限 -->
+  <el-drawer v-model="drawer">
+    <template #header>
+      <h4>分配菜单按钮的权限</h4>
+    </template>
+    <templater #>
+      <el-tree
+        ref="tree"
+        :data="menuArr"
+        show-checkbox
+        default-expand-all
+        node-key="id"
+        :default-checked-keys="selectArr"
+        :props="defaultProps"
+      ></el-tree>
+    </templater>
+    <template #footer>
+      <div style="flex: auto">
+        <el-button @click="drawer = false">取消</el-button>
+        <el-button type="primary" @click="handler">确定</el-button>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <script setup>
 import useLayOutSettingStore from '@/stores/modules/setting'
 import { ref, onMounted, reactive, nextTick } from 'vue'
-import { reqAllRoleList } from '@/api/acl/role'
-import { reqAddOrUpdateRole } from '@/api/acl/role'
+import {
+  reqAllRoleList,
+  reqAddOrUpdateRole,
+  reqAllMenuList,
+  reqSetPermisstion
+} from '@/api/acl/role'
 const settingStore = useLayOutSettingStore()
 //当前页码
 let pageNo = ref(1)
@@ -105,6 +132,8 @@ let RoleParams = reactive({
 })
 //获取form实例
 let form = ref()
+
+let drawer = ref(false)
 //获取全部用户信息的方法
 const getHasRole = async (pager = 1) => {
   pageNo.value = pager
@@ -176,6 +205,48 @@ const updateRole = (row) => {
   nextTick(() => {
     form.value.clearValidate('roleName')
   })
+}
+let menuArr = ref([])
+let selectArr = ref([])
+//树形控件的自定义prop
+const defaultProps = {
+  children: 'children',
+  label: 'name'
+}
+const setPermisstion = async (row) => {
+  drawer.value = true
+  Object.assign(RoleParams, row)
+  let res = await reqAllMenuList(RoleParams.id)
+  if (res.code == 200) {
+    menuArr.value = res.data
+    selectArr.value = filterSelectArr(menuArr.value, [])
+  }
+}
+const filterSelectArr = (allData, initArr) => {
+  allData.forEach((item) => {
+    if (item.select && item.level == 4) {
+      initArr.push(item.id)
+    }
+    if (item.children && item.children.length > 0) {
+      filterSelectArr(item.children, initArr)
+    }
+  })
+  return initArr
+}
+//抽屉确定按钮的回调
+let tree = ref()
+const handler = async () => {
+  const roleId = RoleParams.id
+  let arr = tree.value.getCheckedKeys()
+  let arr1 = tree.value.getHalfCheckedKeys()
+  let permissionId = arr.concat(arr1)
+
+  let res = await reqSetPermisstion(roleId, permissionId)
+  if (res.code == 200) {
+    drawer.value = false
+    ElMessage({ type: 'success', message: '分配权限成功' })
+    window.location.reload()
+  }
 }
 </script>
 
