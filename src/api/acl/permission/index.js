@@ -15,3 +15,15 @@ const API = {
 export const reqAllPermisstion = () => {
   return request.get(API.ALLPERMISSTION_URL)
 }
+
+// 添加与更新菜单的方法
+export const reqAddOrUpdateMenu = (data) => {
+  if (data.id) {
+    return request.put(API.UPDATE_URL, data)
+  } else {
+    return request.post(API.ADDMENU_URL, data)
+  }
+}
+
+//删除某一个已有的菜单
+export const reqRemoveMenu = (id) => request.delete(API.DELETEMENU_URL + id)
