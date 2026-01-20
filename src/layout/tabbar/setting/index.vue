@@ -2,10 +2,11 @@
   <el-button size="small" circle icon="Refresh" @click="updateRefsh"></el-button>
   <el-button size="small" circle icon="fullScreen" @click="fullScreen"></el-button>
 
-  <el-popover placement="bottom" title="主题设置" :width="300" trigger="hover">
+  <el-popover placement="bottom" title="主题设置" :width="300" trigger="click">
     <el-form>
       <el-form-item label="主题颜色">
         <el-color-picker
+          @change="setColor"
           v-model="color"
           size="small"
           show-alpha
@@ -14,6 +15,7 @@
       </el-form-item>
       <el-form-item label="暗黑模式">
         <el-switch
+          @change="changeDark"
           v-model="dark"
           class="mt-2"
           style="margin-left: 24px"
@@ -95,6 +97,18 @@ const predefineColors = ref([
   'hsla(209, 100%, 56%, 0.73)',
   '#c7158577'
 ])
+
+//暗黑模式切换
+//收集开关的数据
+let dark = ref(false)
+const changeDark = () => {
+  let html = document.documentElement
+  dark.value ? (html.className = 'dark') : (html.className = '')
+}
+const setColor = () => {
+  const html = document.documentElement
+  html.style.setProperty('--el-color-primary', color.value)
+}
 </script>
 
 <style lang="scss" scoped></style>
