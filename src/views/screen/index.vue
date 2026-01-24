@@ -5,8 +5,12 @@
       <div class="top">
         <top></top>
       </div>
-      <div class="botton">
-        <div class="left">左</div>
+      <div class="bottom">
+        <div class="left">
+          <tourist class="tourist"></tourist>
+          <sex class="sex"></sex>
+          <age class="age"></age>
+        </div>
         <div class="center">中</div>
         <div class="right">右</div>
       </div>
@@ -17,6 +21,10 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import top from './components/top/index.vue'
+import tourist from './components/tourist/index.vue'
+import age from './components/age/index.vue'
+import sex from './components/sex/index.vue'
+
 //获取数据大屏展示内容盒子的DOM元素
 let screen = ref()
 onMounted(() => {
@@ -51,10 +59,23 @@ function getScale(w = 1920, h = 1080) {
       width: 100%;
       height: 40px;
     }
-    .botton {
+    .bottom {
       display: flex;
       .left {
         flex: 1;
+        height: 1040px;
+        display: flex;
+        flex-direction: column;
+
+        .tourist {
+          flex: 1.2;
+        }
+        .sex {
+          flex: 1;
+        }
+        .age {
+          flex: 1;
+        }
       }
       .right {
         flex: 1;
